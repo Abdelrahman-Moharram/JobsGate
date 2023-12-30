@@ -25,7 +25,59 @@ namespace JobsGate.Data
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins", schema: "Identity");
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", schema: "Identity");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", schema: "Identity");
+
+
+
+
+
+
+
+            string AdminRoleId = Guid.NewGuid().ToString();
+            string AdminId = Guid.NewGuid().ToString();
+
+
+            // Roles
+            builder.Entity<IdentityRole>().HasData(
+            new IdentityRole
+            {
+                Id = AdminRoleId,
+                Name = "Admin",
+                NormalizedName = "ADMIN"
+            },
+            new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "User",
+                NormalizedName = "USER"
+            }
+            );
+
+            //  create system admin
+
+            var hasher = new PasswordHasher<ApplicationUser>();
+            builder.Entity<ApplicationUser>().HasData(
+                    new ApplicationUser
+                    {
+                        Id = AdminId,
+                        UserName = "Admin",
+                        NormalizedUserName = "Admin",
+                        Email = "admin@site.com",
+                        NormalizedEmail = "admin@site.com",
+                        EmailConfirmed = true,
+                        PasswordHash = hasher.HashPassword(null, "12345678"),
+                        SecurityStamp = string.Empty,
+                        Image = "img/users/user.webp"
+                    });
+
+            builder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
+            {
+                RoleId = AdminRoleId,
+                UserId = AdminId
+            });
+
             
+
+
         }
 
     }

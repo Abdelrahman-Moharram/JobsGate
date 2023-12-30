@@ -1,6 +1,8 @@
 
 using JobsGate.Data;
+using JobsGate.Helpers;
 using JobsGate.Models;
+using JobsGate.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +23,29 @@ namespace JobsGate
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // ----------------------- Scopes ------------------//
+            builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
+            // ---------------------------------------------- //
             // ----------------------- DbContext ------------------//
 
-                builder.Services.AddDbContext<ApplicationDbContext>(options=>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            builder.Services.AddDbContext<ApplicationDbContext>(options=>
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                 );
             // ---------------------------------------------- //
 
             // ----------------------- AddIdentity ------------------//
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequireNonAlphanumeric=false;
+                options.Password.RequireDigit=false;
+                options.Password.RequireLowercase=false;
+                options.Password.RequireUppercase=false;
+                options.Password.RequiredLength=8;
+            }).AddEntityFrameworkStores<ApplicationDbContext>();
+
             //----------------------------------------------//
 
             builder.Services.AddAuthentication(options =>

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobsGate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231229164631_IdentityTables")]
-    partial class IdentityTables
+    [Migration("20231229234452_DataSeeding")]
+    partial class DataSeeding
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,6 @@ namespace JobsGate.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -49,7 +48,6 @@ namespace JobsGate.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -86,11 +84,9 @@ namespace JobsGate.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("city")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("region")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -104,6 +100,25 @@ namespace JobsGate.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("Users", "Identity");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "2247d3e7-7410-455a-8fa6-8489f283ad96",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ae5c02d0-b195-4a96-8c43-a5b7e1ef996a",
+                            Email = "admin@site.com",
+                            EmailConfirmed = true,
+                            Image = "img/users/user.webp",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "admin@site.com",
+                            NormalizedUserName = "Admin",
+                            PasswordHash = "AQAAAAIAAYagAAAAECI8UcGWDZpnIVdI+vFFvpFecJeq2Nm0ZYOQ2DnwouxOn/aqs2uhFIgH+BFyJxVH1w==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "",
+                            TwoFactorEnabled = false,
+                            UserName = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -131,6 +146,20 @@ namespace JobsGate.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Roles", "Identity");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "4c396984-afbb-48b4-adf1-614e060834f9",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "3ece1275-fa26-411e-98c5-ba80bc66f978",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -218,6 +247,13 @@ namespace JobsGate.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", "Identity");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "2247d3e7-7410-455a-8fa6-8489f283ad96",
+                            RoleId = "4c396984-afbb-48b4-adf1-614e060834f9"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
