@@ -27,13 +27,11 @@ namespace JobsGate
             builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-            // ---------------------------------------------- //
             // ----------------------- DbContext ------------------//
 
             builder.Services.AddDbContext<ApplicationDbContext>(options=>
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                 );
-            // ---------------------------------------------- //
 
             // ----------------------- AddIdentity ------------------//
 
@@ -46,8 +44,8 @@ namespace JobsGate
                 options.Password.RequiredLength=8;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //----------------------------------------------//
 
+            // ----------------------- Add Authentication configirations ------------------//
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -69,6 +67,7 @@ namespace JobsGate
                 };
 
             });
+            //----------------------------------------------------------------------------------//
 
             var app = builder.Build();
 
