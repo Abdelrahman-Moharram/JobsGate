@@ -6,8 +6,11 @@
 
         public string? Headline { get; set; }
 
-        public string IndustryId { get; set; }
+        public string? IndustryId { get; set; }
         public virtual Industry? Industry { get; set; }
+        public virtual List<JobApplication>? JobsApplications { get; set; }
+        public virtual List<Job>? Jobs{ get; set; }
+
 
     }
 }

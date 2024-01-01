@@ -27,6 +27,12 @@
 
         public string? CategoryId { get; set; }
         public virtual Category? Category { get; set; }
+        
+        public string? JobTypeId { get; set; }
+        public virtual JobType? JobType { get; set; }
+
+        public virtual List<JobApplication>? JobsApplications { get; set; }
+        public virtual List<Employee>? Employees{ get; set; }
 
     }
 }
