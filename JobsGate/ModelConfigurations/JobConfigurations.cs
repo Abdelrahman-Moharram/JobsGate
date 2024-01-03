@@ -1,6 +1,8 @@
 ﻿using JobsGate.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
+using System.Reflection.Metadata;
 
 namespace JobsGate.ModelConfigurations
 {
@@ -8,13 +10,10 @@ namespace JobsGate.ModelConfigurations
     {
         public void Configure(EntityTypeBuilder<Job> builder)
         {
-            builder
-                .ToTable(nameof(Job), schema:"job");
 
             builder
                 .Property(i => i.Salary)
-                .HasColumnType("money")
-                .HasDefaultValue("0m");
+                .HasColumnType("Money");
 
             builder
                 .Property(i => i.Experience)
@@ -55,8 +54,8 @@ namespace JobsGate.ModelConfigurations
                 {
                     ja
                         .HasOne(jaj => jaj.Job)
-                        .WithMany()
-                        .HasForeignKey(jai => jai.JobId);
+                        .WithMany(js => js.JobsApplications)
+                        .HasForeignKey(jai=>jai.JobId);
 
                     ja
                         .HasOne(jae => jae.Employee)

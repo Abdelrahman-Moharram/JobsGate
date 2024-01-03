@@ -14,10 +14,13 @@ namespace JobsGate.Services
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly JWTSettings jwt;
-        public AuthService(UserManager<ApplicationUser> _userManager, IOptions<JWTSettings> _jwt)
+        private readonly RoleManager<IdentityRole> roleManager;
+        public AuthService(UserManager<ApplicationUser> _userManager, IOptions<JWTSettings> _jwt, RoleManager<IdentityRole> _roleManager)
         {
             userManager = _userManager;
             jwt = _jwt.Value;
+            roleManager = _roleManager;
+            
         }
 
 
@@ -25,7 +28,7 @@ namespace JobsGate.Services
         {
             if (await userManager.FindByEmailAsync(userDTO.Email) != null) return new AuthResultDTO {IsAuthenticated = false, Message = "This Email already exists!"};
             if (await userManager.FindByNameAsync(userDTO.UserName) != null) return new AuthResultDTO{IsAuthenticated = false,Message = "This UserName already exists!"};
-
+            if (await roleManager.FindByNameAsync(userDTO.RegisterAs) == null) return new AuthResultDTO { IsAuthenticated = false, Message = userDTO.RegisterAs + " is Invalid Role" };
             ApplicationUser user = new ApplicationUser 
             {
                 UserName = userDTO.UserName,
@@ -34,8 +37,8 @@ namespace JobsGate.Services
             };
             var result =  await userManager.CreateAsync(user, userDTO.Password);
             if (!result.Succeeded) return new AuthResultDTO { IsAuthenticated = false, Message = "Something went wrong cantact with admin!" };
-
-            result = await userManager.AddToRoleAsync(user, "User");
+            
+            result = await userManager.AddToRoleAsync(user, userDTO.RegisterAs);
             if (!result.Succeeded) return new AuthResultDTO { IsAuthenticated = false, Message = "Something went wrong cantact with admin!" };
 
             JwtSecurityToken token = await CreateJWT(user);
@@ -115,5 +118,23 @@ namespace JobsGate.Services
              );
         }
 
+        public async Task<string> AddToRoleAsync(AddRoleDTO addRole)
+        {
+            ApplicationUser user = await userManager.FindByIdAsync(addRole.userId);
+            IdentityRole role = await roleManager.FindByNameAsync(addRole.roleName);
+            if (user != null && role != null)
+            {
+                if (await userManager.IsInRoleAsync(user, addRole.roleName))
+                    return "User already assigned to this role";
+
+                var result = await userManager.AddToRoleAsync(user, addRole.roleName);
+                if (result.Succeeded)
+                {
+                    return user.UserName + " added to " + addRole.roleName + " Successfully";
+                }
+                return "Something went wrong";
+            }
+            return "Invalid user or Role";
+        }
     }
 }

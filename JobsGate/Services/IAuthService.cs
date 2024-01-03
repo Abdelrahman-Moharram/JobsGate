@@ -9,5 +9,6 @@ namespace JobsGate.Services
         Task<AuthResultDTO> Register(RegisterDTO userDTO);
         Task<JwtSecurityToken> CreateJWT(ApplicationUser user);
         Task<AuthResultDTO> Login(AuthLoginDTO loginDTO);
+        Task<string> AddToRoleAsync(AddRoleDTO addRole);
     }
 }

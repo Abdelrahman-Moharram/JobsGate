@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobsGate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231229234452_DataSeeding")]
+    [Migration("20240103045200_DataSeeding")]
     partial class DataSeeding
     {
         /// <inheritdoc />
@@ -101,23 +101,168 @@ namespace JobsGate.Migrations
 
                     b.ToTable("Users", "Identity");
 
+                    b.UseTptMappingStrategy();
+
                     b.HasData(
                         new
                         {
-                            Id = "2247d3e7-7410-455a-8fa6-8489f283ad96",
+                            Id = "06f392af-9286-4a5f-ac9a-0668130f427d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ae5c02d0-b195-4a96-8c43-a5b7e1ef996a",
+                            ConcurrencyStamp = "70a30acd-569a-4683-9fd3-2a663b878882",
                             Email = "admin@site.com",
                             EmailConfirmed = true,
                             Image = "img/users/user.webp",
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@site.com",
                             NormalizedUserName = "Admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAECI8UcGWDZpnIVdI+vFFvpFecJeq2Nm0ZYOQ2DnwouxOn/aqs2uhFIgH+BFyJxVH1w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ8ErdTyQ0WMQ0X/TIJjI8JUvjqdP7xMDZoX60UmDVdzkZhx4yoOIKCvGfK71aCRAw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
+                        });
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Category", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("IndustryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IndustryId");
+
+                    b.ToTable("Categories", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Industry", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Industries", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Job", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CategoryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Experience")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("IndustryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("JobTypeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("PostedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("Money");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Vacancies")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("EmployeerId");
+
+                    b.HasIndex("IndustryId");
+
+                    b.HasIndex("JobTypeId");
+
+                    b.ToTable("Jobs", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.JobApplication", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CV")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverLetter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("JobId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("JobApplications", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.JobType", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobTypes", "job");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "8b2d2f09-200f-4c93-9f2b-494e00957053",
+                            Name = "Full Time"
+                        },
+                        new
+                        {
+                            Id = "b7763067-d390-472e-b37f-90dc2104202c",
+                            Name = "Part Time"
+                        },
+                        new
+                        {
+                            Id = "28106627-c5e6-4156-a421-d57dd6028c22",
+                            Name = "Remote"
                         });
                 });
 
@@ -150,15 +295,21 @@ namespace JobsGate.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4c396984-afbb-48b4-adf1-614e060834f9",
+                            Id = "274d41cc-5ae8-497b-a5dc-40689e885a81",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3ece1275-fa26-411e-98c5-ba80bc66f978",
-                            Name = "User",
-                            NormalizedName = "USER"
+                            Id = "28e4b1e3-386e-48f2-8f28-a625120c8978",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        },
+                        new
+                        {
+                            Id = "490b1f92-896a-4a7e-b3fa-b2ab55a07d08",
+                            Name = "Employer",
+                            NormalizedName = "EMPLOYER"
                         });
                 });
 
@@ -251,8 +402,8 @@ namespace JobsGate.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "2247d3e7-7410-455a-8fa6-8489f283ad96",
-                            RoleId = "4c396984-afbb-48b4-adf1-614e060834f9"
+                            UserId = "06f392af-9286-4a5f-ac9a-0668130f427d",
+                            RoleId = "274d41cc-5ae8-497b-a5dc-40689e885a81"
                         });
                 });
 
@@ -273,6 +424,82 @@ namespace JobsGate.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserTokens", "Identity");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employee", b =>
+                {
+                    b.HasBaseType("JobsGate.Models.ApplicationUser");
+
+                    b.Property<string>("Headline")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IndustryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasIndex("IndustryId");
+
+                    b.ToTable("Employees", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employeer", b =>
+                {
+                    b.HasBaseType("JobsGate.Models.ApplicationUser");
+
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("Employeers", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Category", b =>
+                {
+                    b.HasOne("JobsGate.Models.Industry", "Industry")
+                        .WithMany("Categories")
+                        .HasForeignKey("IndustryId");
+
+                    b.Navigation("Industry");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Job", b =>
+                {
+                    b.HasOne("JobsGate.Models.Category", "Category")
+                        .WithMany("Jobs")
+                        .HasForeignKey("CategoryId");
+
+                    b.HasOne("JobsGate.Models.Employeer", "Employeer")
+                        .WithMany("Jobs")
+                        .HasForeignKey("EmployeerId");
+
+                    b.HasOne("JobsGate.Models.Industry", "Industry")
+                        .WithMany("Jobs")
+                        .HasForeignKey("IndustryId");
+
+                    b.HasOne("JobsGate.Models.JobType", "JobType")
+                        .WithMany("Jobs")
+                        .HasForeignKey("JobTypeId");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Employeer");
+
+                    b.Navigation("Industry");
+
+                    b.Navigation("JobType");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.JobApplication", b =>
+                {
+                    b.HasOne("JobsGate.Models.Employee", "Employee")
+                        .WithMany("JobsApplications")
+                        .HasForeignKey("EmployeeId");
+
+                    b.HasOne("JobsGate.Models.Job", "Job")
+                        .WithMany("JobsApplications")
+                        .HasForeignKey("JobId");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Job");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -324,6 +551,62 @@ namespace JobsGate.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employee", b =>
+                {
+                    b.HasOne("JobsGate.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("JobsGate.Models.Employee", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("JobsGate.Models.Industry", "Industry")
+                        .WithMany()
+                        .HasForeignKey("IndustryId");
+
+                    b.Navigation("Industry");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employeer", b =>
+                {
+                    b.HasOne("JobsGate.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("JobsGate.Models.Employeer", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Category", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Industry", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Job", b =>
+                {
+                    b.Navigation("JobsApplications");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.JobType", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employee", b =>
+                {
+                    b.Navigation("JobsApplications");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employeer", b =>
+                {
+                    b.Navigation("Jobs");
                 });
 #pragma warning restore 612, 618
         }

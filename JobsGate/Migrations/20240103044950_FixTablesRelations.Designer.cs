@@ -4,6 +4,7 @@ using JobsGate.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobsGate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240103044950_FixTablesRelations")]
+    partial class FixTablesRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,25 +102,6 @@ namespace JobsGate.Migrations
                     b.ToTable("Users", "Identity");
 
                     b.UseTptMappingStrategy();
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "06f392af-9286-4a5f-ac9a-0668130f427d",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "70a30acd-569a-4683-9fd3-2a663b878882",
-                            Email = "admin@site.com",
-                            EmailConfirmed = true,
-                            Image = "img/users/user.webp",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "admin@site.com",
-                            NormalizedUserName = "Admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ8ErdTyQ0WMQ0X/TIJjI8JUvjqdP7xMDZoX60UmDVdzkZhx4yoOIKCvGfK71aCRAw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "",
-                            TwoFactorEnabled = false,
-                            UserName = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("JobsGate.Models.Category", b =>
@@ -244,23 +228,6 @@ namespace JobsGate.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("JobTypes", "job");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "8b2d2f09-200f-4c93-9f2b-494e00957053",
-                            Name = "Full Time"
-                        },
-                        new
-                        {
-                            Id = "b7763067-d390-472e-b37f-90dc2104202c",
-                            Name = "Part Time"
-                        },
-                        new
-                        {
-                            Id = "28106627-c5e6-4156-a421-d57dd6028c22",
-                            Name = "Remote"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -288,26 +255,6 @@ namespace JobsGate.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Roles", "Identity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "274d41cc-5ae8-497b-a5dc-40689e885a81",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "28e4b1e3-386e-48f2-8f28-a625120c8978",
-                            Name = "Employee",
-                            NormalizedName = "EMPLOYEE"
-                        },
-                        new
-                        {
-                            Id = "490b1f92-896a-4a7e-b3fa-b2ab55a07d08",
-                            Name = "Employer",
-                            NormalizedName = "EMPLOYER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -395,13 +342,6 @@ namespace JobsGate.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", "Identity");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "06f392af-9286-4a5f-ac9a-0668130f427d",
-                            RoleId = "274d41cc-5ae8-497b-a5dc-40689e885a81"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

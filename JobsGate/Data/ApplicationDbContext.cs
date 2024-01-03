@@ -1,4 +1,5 @@
-﻿using JobsGate.Models;
+﻿using JobsGate.ModelConfigurations;
+using JobsGate.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,8 @@ namespace JobsGate.Data
         {
             base.OnModelCreating(builder);
 
-
+            // Tables And Schemas
+            
             builder.Entity<ApplicationUser>().ToTable("Users", schema: "Identity");
             builder.Entity<IdentityRole>().ToTable("Roles", schema: "Identity");
             builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", schema: "Identity");
@@ -26,30 +28,44 @@ namespace JobsGate.Data
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", schema: "Identity");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", schema: "Identity");
 
+            builder.Entity<Job>().ToTable("Jobs", schema: "job");
+            builder.Entity<Category>().ToTable("Categories", schema: "job");
+            builder.Entity<Employee>().ToTable("Employees", schema: "job");
+            builder.Entity<Employeer>().ToTable("Employeers", schema: "job");
+            builder.Entity<Industry>().ToTable("Industries", schema: "job");
+            builder.Entity<JobApplication>().ToTable("JobApplications", schema: "job");
+            builder.Entity<JobType>().ToTable("JobTypes", schema: "job");
+
+            // _____________________________________________________________ //
+
+            new JobConfigurations().Configure(builder.Entity<Job>());
 
 
-
-
-
-
+            // Data Seeding
             string AdminRoleId = Guid.NewGuid().ToString();
             string AdminId = Guid.NewGuid().ToString();
 
 
             // Roles
             builder.Entity<IdentityRole>().HasData(
-            new IdentityRole
-            {
-                Id = AdminRoleId,
-                Name = "Admin",
-                NormalizedName = "ADMIN"
-            },
-            new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "User",
-                NormalizedName = "USER"
-            }
+                new IdentityRole
+                {
+                    Id = AdminRoleId,
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                new IdentityRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Employee",
+                    NormalizedName = "EMPLOYEE"
+                },
+                new IdentityRole
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Employer",
+                    NormalizedName = "EMPLOYER"
+                }
             );
 
             //  create system admin
@@ -75,7 +91,23 @@ namespace JobsGate.Data
                 UserId = AdminId
             });
 
-            
+            builder.Entity<JobType>().HasData(
+                new JobType
+                {
+                    Name = "Full Time"
+                },
+                new JobType
+                {
+                    Name = "Part Time"
+                },
+                new JobType
+                {
+                    Name = "Remote"
+                }
+            );
+
+            // _____________________________________________________________ //
+
 
 
         }
