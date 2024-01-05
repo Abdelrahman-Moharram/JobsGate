@@ -114,6 +114,7 @@ namespace JobsGate.Services
                        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                        new Claim(JwtRegisteredClaimNames.Email, user.Email),
                        new Claim(ClaimTypes.NameIdentifier, user.Id),
+                       new Claim("userId", user.Id),
                 }
             .Union(userClaims)
             .Union(roleClaims);
