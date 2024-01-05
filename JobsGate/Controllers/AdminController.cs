@@ -71,40 +71,8 @@ namespace JobsGate.Controllers
             return BadRequest(category.Title);
         }
 
-        [HttpGet("jobs")]
-        public async Task<IActionResult> Jobs([FromQuery] int start = 0, [FromQuery] int end = 10)
-        {
-            var jobs = await JobRepository.PaginateAsync(start, end);
-            List<JobsDTO> jobsListDTOs = new List<JobsDTO>();
-            foreach (var job in jobs)
-            {
-                jobsListDTOs.Add(new JobsDTO
-                {
-                    Id = job.Id,
-                    Title = job.Title,
-                    Category = job.Category?.Title,
-                    Description = job.Description,
-                    Employer = job.Employer?.UserName,
-                    Experience = job.Experience,
-                    PostedAt = job.PostedAt,
-                    Salary = job.Salary,
-                    Industry = job.Industry?.Title,
-                    vacancies = job.Vacancies,
-                });
-            }
-            return Ok(jobsListDTOs);
-        }
-        [HttpPost("jobs/add")]
-        public async Task<IActionResult> AddJob([FromBody] Job job)
-        {
-            if (ModelState.IsValid)
-            {
-                JobRepository.AddAsync(job);
-                JobRepository.Save();
-                return Ok(job);
-            }
-            return BadRequest(job);
-        }
+        
+        
 
     }
 }

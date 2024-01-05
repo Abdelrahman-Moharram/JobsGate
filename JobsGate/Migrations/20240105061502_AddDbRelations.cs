@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JobsGate.Migrations
 {
     /// <inheritdoc />
-    public partial class FixTablesRelations : Migration
+    public partial class AddDbRelations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,19 +15,20 @@ namespace JobsGate.Migrations
                 name: "job");
 
             migrationBuilder.CreateTable(
-                name: "Employeers",
+                name: "Employers",
                 schema: "job",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employeers", x => x.Id);
+                    table.PrimaryKey("PK_Employers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employeers_Users_Id",
-                        column: x => x.Id,
+                        name: "FK_Employers_Users_UserId",
+                        column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -40,7 +41,7 @@ namespace JobsGate.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -67,7 +68,7 @@ namespace JobsGate.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IndustryId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    IndustryId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,7 +78,8 @@ namespace JobsGate.Migrations
                         column: x => x.IndustryId,
                         principalSchema: "job",
                         principalTable: "Industries",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,7 +89,8 @@ namespace JobsGate.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Headline = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IndustryId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    IndustryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -99,8 +102,8 @@ namespace JobsGate.Migrations
                         principalTable: "Industries",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Employees_Users_Id",
-                        column: x => x.Id,
+                        name: "FK_Employees_Users_UserId",
+                        column: x => x.UserId,
                         principalSchema: "Identity",
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -113,16 +116,16 @@ namespace JobsGate.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     Vacancies = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
-                    Salary = table.Column<decimal>(type: "Money", nullable: false),
+                    Salary = table.Column<decimal>(type: "Money", nullable: true, defaultValue: 0m),
                     Experience = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
-                    EmployeerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    IndustryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CategoryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    JobTypeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    EmployerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IndustryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CategoryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    JobTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -132,13 +135,15 @@ namespace JobsGate.Migrations
                         column: x => x.CategoryId,
                         principalSchema: "job",
                         principalTable: "Categories",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Jobs_Employeers_EmployeerId",
-                        column: x => x.EmployeerId,
+                        name: "FK_Jobs_Employers_EmployerId",
+                        column: x => x.EmployerId,
                         principalSchema: "job",
-                        principalTable: "Employeers",
-                        principalColumn: "Id");
+                        principalTable: "Employers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Jobs_Industries_IndustryId",
                         column: x => x.IndustryId,
@@ -150,7 +155,8 @@ namespace JobsGate.Migrations
                         column: x => x.JobTypeId,
                         principalSchema: "job",
                         principalTable: "JobTypes",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -194,6 +200,18 @@ namespace JobsGate.Migrations
                 column: "IndustryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Employees_UserId",
+                schema: "job",
+                table: "Employees",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employers_UserId",
+                schema: "job",
+                table: "Employers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JobApplications_EmployeeId",
                 schema: "job",
                 table: "JobApplications",
@@ -212,10 +230,10 @@ namespace JobsGate.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Jobs_EmployeerId",
+                name: "IX_Jobs_EmployerId",
                 schema: "job",
                 table: "Jobs",
-                column: "EmployeerId");
+                column: "EmployerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Jobs_IndustryId",
@@ -250,7 +268,7 @@ namespace JobsGate.Migrations
                 schema: "job");
 
             migrationBuilder.DropTable(
-                name: "Employeers",
+                name: "Employers",
                 schema: "job");
 
             migrationBuilder.DropTable(

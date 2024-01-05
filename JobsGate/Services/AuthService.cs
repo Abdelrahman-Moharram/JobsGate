@@ -48,10 +48,12 @@ namespace JobsGate.Services
             };
             var result =  await userManager.CreateAsync(user, userDTO.Password);
             if (!result.Succeeded) return new AuthResultDTO { IsAuthenticated = false, Message = "Something went wrong cantact with admin!" };
-            
+
             result = await userManager.AddToRoleAsync(user, userDTO.RegisterAs);
             if (!result.Succeeded) return new AuthResultDTO { IsAuthenticated = false, Message = "Something went wrong cantact with admin!" };
-            if (!await CreateUserRole(user, userDTO.RegisterAs))
+
+
+            if (!await CreateUserRole(user.Id, userDTO.RegisterAs))
                 return new AuthResultDTO { IsAuthenticated = false, Message = userDTO.RegisterAs + " is Invalid Role but you successfully registered, please contact the admin!" };
 
             JwtSecurityToken token = await CreateJWT(user);
@@ -112,7 +114,6 @@ namespace JobsGate.Services
                        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                        new Claim(JwtRegisteredClaimNames.Email, user.Email),
                        new Claim(ClaimTypes.NameIdentifier, user.Id),
-                       new Claim(ClaimTypes.Role, "User"),
                 }
             .Union(userClaims)
             .Union(roleClaims);
@@ -150,13 +151,13 @@ namespace JobsGate.Services
             }
             return "Invalid user or Role";
         }
-        public async Task<bool> CreateUserRole(ApplicationUser user, string role)
+        public async Task<bool> CreateUserRole(string userId, string role)
         {
             if(role?.ToLower() == "employee")
             {
                 EmployeeRepository.AddAsync(new Employee
                 {
-                    Id = user.Id,
+                    UserId = userId,
                 });
                 EmployeeRepository.Save();
                 return true;
@@ -165,9 +166,9 @@ namespace JobsGate.Services
             {
                 EmployerRepository.AddAsync(new Employer
                 {
-                    Id = user.Id,
+                    UserId = userId,
                 });
-                EmployeeRepository.Save();
+                EmployerRepository.Save();
 
                 return true;
             }

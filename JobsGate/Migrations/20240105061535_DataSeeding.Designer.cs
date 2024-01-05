@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobsGate.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240105032146_fixEmployerAndNullAttrs")]
-    partial class fixEmployerAndNullAttrs
+    [Migration("20240105061535_DataSeeding")]
+    partial class DataSeeding
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -100,27 +100,6 @@ namespace JobsGate.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("Users", "Identity");
-
-                    b.UseTptMappingStrategy();
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "51bb59cf-075a-4328-91eb-98da24fa392d",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "b778cd18-49bc-47b3-a6c7-31c58a3d8b6f",
-                            Email = "admin@site.com",
-                            EmailConfirmed = true,
-                            Image = "img/users/user.webp",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "admin@site.com",
-                            NormalizedUserName = "Admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMHebhuJdKbC2f0VXtcSEYARqd2Vs0mHQTXwLE7DMttARPAKExx/1nK7+vsXQmYnWw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "",
-                            TwoFactorEnabled = false,
-                            UserName = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("JobsGate.Models.Category", b =>
@@ -141,6 +120,49 @@ namespace JobsGate.Migrations
                     b.HasIndex("IndustryId");
 
                     b.ToTable("Categories", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employee", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Headline")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IndustryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IndustryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Employees", "job");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employer", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Employers", "job");
                 });
 
             modelBuilder.Entity("JobsGate.Models.Industry", b =>
@@ -257,23 +279,6 @@ namespace JobsGate.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("JobTypes", "job");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "e3ffb6bb-2bb8-419c-8b0f-cb72f1660961",
-                            Name = "Full Time"
-                        },
-                        new
-                        {
-                            Id = "f7bdfcf0-de67-4950-a346-c1582a695c2c",
-                            Name = "Part Time"
-                        },
-                        new
-                        {
-                            Id = "0512818f-a6bc-4455-9ea7-64cf7684fefa",
-                            Name = "Remote"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -301,26 +306,6 @@ namespace JobsGate.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Roles", "Identity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "57a58a0b-c6b6-417c-ab64-5aecb86150b6",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "ec800d8a-6bdb-4acb-8945-fef6d77475ee",
-                            Name = "Employee",
-                            NormalizedName = "EMPLOYEE"
-                        },
-                        new
-                        {
-                            Id = "f625d819-3400-4b1d-9026-55ada6f9e0ac",
-                            Name = "Employer",
-                            NormalizedName = "EMPLOYER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -408,13 +393,6 @@ namespace JobsGate.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", "Identity");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "51bb59cf-075a-4328-91eb-98da24fa392d",
-                            RoleId = "57a58a0b-c6b6-417c-ab64-5aecb86150b6"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -436,31 +414,6 @@ namespace JobsGate.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("JobsGate.Models.Employee", b =>
-                {
-                    b.HasBaseType("JobsGate.Models.ApplicationUser");
-
-                    b.Property<string>("Headline")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IndustryId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("IndustryId");
-
-                    b.ToTable("Employees", "job");
-                });
-
-            modelBuilder.Entity("JobsGate.Models.Employer", b =>
-                {
-                    b.HasBaseType("JobsGate.Models.ApplicationUser");
-
-                    b.Property<string>("JobTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("Employeers", "job");
-                });
-
             modelBuilder.Entity("JobsGate.Models.Category", b =>
                 {
                     b.HasOne("JobsGate.Models.Industry", "Industry")
@@ -470,6 +423,34 @@ namespace JobsGate.Migrations
                         .IsRequired();
 
                     b.Navigation("Industry");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employee", b =>
+                {
+                    b.HasOne("JobsGate.Models.Industry", "Industry")
+                        .WithMany()
+                        .HasForeignKey("IndustryId");
+
+                    b.HasOne("JobsGate.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Industry");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("JobsGate.Models.Employer", b =>
+                {
+                    b.HasOne("JobsGate.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("JobsGate.Models.Job", b =>
@@ -573,31 +554,17 @@ namespace JobsGate.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("JobsGate.Models.Category", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
             modelBuilder.Entity("JobsGate.Models.Employee", b =>
                 {
-                    b.HasOne("JobsGate.Models.ApplicationUser", null)
-                        .WithOne()
-                        .HasForeignKey("JobsGate.Models.Employee", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("JobsGate.Models.Industry", "Industry")
-                        .WithMany()
-                        .HasForeignKey("IndustryId");
-
-                    b.Navigation("Industry");
+                    b.Navigation("JobsApplications");
                 });
 
             modelBuilder.Entity("JobsGate.Models.Employer", b =>
-                {
-                    b.HasOne("JobsGate.Models.ApplicationUser", null)
-                        .WithOne()
-                        .HasForeignKey("JobsGate.Models.Employer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("JobsGate.Models.Category", b =>
                 {
                     b.Navigation("Jobs");
                 });
@@ -615,16 +582,6 @@ namespace JobsGate.Migrations
                 });
 
             modelBuilder.Entity("JobsGate.Models.JobType", b =>
-                {
-                    b.Navigation("Jobs");
-                });
-
-            modelBuilder.Entity("JobsGate.Models.Employee", b =>
-                {
-                    b.Navigation("JobsApplications");
-                });
-
-            modelBuilder.Entity("JobsGate.Models.Employer", b =>
                 {
                     b.Navigation("Jobs");
                 });

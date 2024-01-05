@@ -31,7 +31,7 @@ namespace JobsGate.Data
             builder.Entity<Job>().ToTable("Jobs", schema: "job");
             builder.Entity<Category>().ToTable("Categories", schema: "job");
             builder.Entity<Employee>().ToTable("Employees", schema: "job");
-            builder.Entity<Employer>().ToTable("Employeers", schema: "job");
+            builder.Entity<Employer>().ToTable("Employers", schema: "job");
             builder.Entity<Industry>().ToTable("Industries", schema: "job");
             builder.Entity<JobApplication>().ToTable("JobApplications", schema: "job");
             builder.Entity<JobType>().ToTable("JobTypes", schema: "job");
@@ -41,7 +41,10 @@ namespace JobsGate.Data
             new JobConfigurations().Configure(builder.Entity<Job>());
 
 
-            // Data Seeding
+            /*// Data Seeding 
+             * Now in migrations folder
+             * 
+             * 
             string AdminRoleId = Guid.NewGuid().ToString();
             string AdminId = Guid.NewGuid().ToString();
 
@@ -106,7 +109,7 @@ namespace JobsGate.Data
                 }
             );
 
-            // _____________________________________________________________ //
+            // _____________________________________________________________ //*/
 
 
 
