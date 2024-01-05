@@ -93,7 +93,7 @@ namespace JobsGate.Controllers
                 if (id == job.Id && ModelState.IsValid)
                 {
                     JobRepository.UpdateAsync(job);
-                    /*JobRepository.Save();*/
+                    JobRepository.Save();
                     return Ok(MapJob(job));
                 }
                 return BadRequest();
@@ -104,7 +104,5 @@ namespace JobsGate.Controllers
                 Message="Invalid user credintials"
             });
         }
-
-
     }
 }
