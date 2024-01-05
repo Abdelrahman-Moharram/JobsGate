@@ -53,6 +53,12 @@ namespace JobsGate.Repository
         {
             Task.FromResult(context.Set<T>().Update(t));
         }
+        public async Task<T> DeleteAsync(T t)
+        {
+            await Task.Run(()=> context.Remove(t));
+            return t;
+        }
+
         public void Save()
         {
             context.SaveChanges();

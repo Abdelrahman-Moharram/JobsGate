@@ -39,6 +39,17 @@ namespace JobsGate.Controllers
                 vacancies = job.Vacancies,
             };
         }
+        private async Task<bool> IsJobPublisherOrAdmin(IEnumerable<Claim> claims, string EmployerId)
+        {
+            var userId = claims.FirstOrDefault(i => i.Type == "userId")?.Value;
+            var Employer = await EmployerRepository.FindAsync(i => i.UserId == userId);
+            var roles = claims.FirstOrDefault(i => i.Type == ClaimTypes.Role)?.Value;
+
+            if (Employer?.Id == EmployerId || roles.ToLower().Contains("admin"))
+                return true;
+
+            return false;
+        }
 
 
 
@@ -84,10 +95,10 @@ namespace JobsGate.Controllers
         [Authorize(Roles = "Employer, Admin")]
         public async Task<IActionResult> EditJob([FromBody] Job job, [FromRoute] string id)
         {
-            var userId = User.Claims.FirstOrDefault(i => i.Type == "userId")?.Value;
-            var Employer =  await EmployerRepository.FindAsync(i=>i.UserId == userId);
-            var roles = User.Claims.FirstOrDefault(i => i.Type == ClaimTypes.Role)?.Value;
-            if (Employer?.Id == job.EmployerId || roles.ToLower().Contains("admin"))
+            if(await JobRepository.GetByIdAsync(id) == null)
+                return NotFound(new ResponseDTO{Message = "Job Not Found"});
+
+            if (await IsJobPublisherOrAdmin(User.Claims, job.EmployerId))
             {
 
                 if (id == job.Id && ModelState.IsValid)
@@ -103,6 +114,24 @@ namespace JobsGate.Controllers
             {
                 Message="Invalid user credintials"
             });
+        }
+
+        [HttpDelete("{id}/Delete")]
+        [Authorize(Roles = "Employer, Admin")]
+        public async Task<IActionResult> DeleteJob([FromRoute] string id)
+        {
+            var job =  await JobRepository.GetByIdAsync(id);
+            if (job == null)
+                return NotFound();
+
+            if (await IsJobPublisherOrAdmin(User.Claims, job.EmployerId))
+            {
+                var j = MapJob(await JobRepository.DeleteAsync(job));
+                JobRepository.Save();
+                return Ok(j);
+            }
+
+            return BadRequest("Invalid user credintials or job not found");
         }
     }
 }

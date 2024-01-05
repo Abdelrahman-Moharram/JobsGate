@@ -11,6 +11,7 @@ namespace JobsGate.Repository
         Task<List<T>> PaginateAsync(int start, int end);
         void AddAsync(T t);
         void UpdateAsync(T t);
+        Task<T> DeleteAsync(T t);
         void Save();
     }
 }
