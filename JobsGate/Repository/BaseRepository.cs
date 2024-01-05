@@ -27,8 +27,8 @@ namespace JobsGate.Repository
             return await 
                 context
                 .Set<T>()
-                .Skip(end)
-                .Take(start)
+                .Skip(start)
+                .Take(end)
                 .ToListAsync();
         }
 

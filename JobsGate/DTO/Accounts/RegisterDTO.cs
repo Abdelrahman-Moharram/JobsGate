@@ -17,6 +17,7 @@ namespace JobsGate.DTO.Accounts
         public string Password { get; set; }
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
+
         public string RegisterAs { get; set; }
     }
 }

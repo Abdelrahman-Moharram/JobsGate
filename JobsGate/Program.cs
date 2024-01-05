@@ -2,6 +2,7 @@
 using JobsGate.Data;
 using JobsGate.Helpers;
 using JobsGate.Models;
+using JobsGate.Repository;
 using JobsGate.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +27,7 @@ namespace JobsGate
             // ----------------------- Scopes ------------------//
             builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             // ----------------------- DbContext ------------------//
 

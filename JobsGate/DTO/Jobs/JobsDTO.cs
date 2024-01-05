@@ -2,7 +2,7 @@
 
 namespace JobsGate.DTO.Jobs
 {
-    public class JobsListDTO
+    public class JobsDTO
     {
         public string? Id { get; set; }
         public string? Title { get; set; }
@@ -10,11 +10,11 @@ namespace JobsGate.DTO.Jobs
         public int vacancies { get; set; }
         public DateTime PostedAt { get; set; }
 
-        public decimal Salary { get; set; }
+        public decimal? Salary { get; set; }
 
         public int Experience {get; set;}
         public string? JobType {get; set;}
-        public string? Employeer {get; set; }
+        public string? Employer {get; set; }
         public string? Industry {get; set;}
         public string? Category { get; set; }
 

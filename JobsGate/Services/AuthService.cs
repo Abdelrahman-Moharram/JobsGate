@@ -1,9 +1,11 @@
 ﻿using JobsGate.DTO.Accounts;
 using JobsGate.Helpers;
 using JobsGate.Models;
+using JobsGate.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,12 +17,21 @@ namespace JobsGate.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly JWTSettings jwt;
         private readonly RoleManager<IdentityRole> roleManager;
-        public AuthService(UserManager<ApplicationUser> _userManager, IOptions<JWTSettings> _jwt, RoleManager<IdentityRole> _roleManager)
+        private readonly IBaseRepository<Employee> EmployeeRepository;
+        private readonly IBaseRepository<Employer> EmployerRepository;
+        public AuthService(
+            UserManager<ApplicationUser> _userManager, 
+            IOptions<JWTSettings> _jwt, 
+            RoleManager<IdentityRole> _roleManager, 
+            IBaseRepository<Employee> _EmployeeRepository,
+            IBaseRepository<Employer> _EmployerRepository
+            )
         {
             userManager = _userManager;
             jwt = _jwt.Value;
             roleManager = _roleManager;
-            
+            EmployeeRepository = _EmployeeRepository;
+            EmployerRepository = _EmployerRepository;
         }
 
 
@@ -40,6 +51,8 @@ namespace JobsGate.Services
             
             result = await userManager.AddToRoleAsync(user, userDTO.RegisterAs);
             if (!result.Succeeded) return new AuthResultDTO { IsAuthenticated = false, Message = "Something went wrong cantact with admin!" };
+            if (!await CreateUserRole(user, userDTO.RegisterAs))
+                return new AuthResultDTO { IsAuthenticated = false, Message = userDTO.RegisterAs + " is Invalid Role but you successfully registered, please contact the admin!" };
 
             JwtSecurityToken token = await CreateJWT(user);
 
@@ -130,11 +143,39 @@ namespace JobsGate.Services
                 var result = await userManager.AddToRoleAsync(user, addRole.roleName);
                 if (result.Succeeded)
                 {
+                    
                     return user.UserName + " added to " + addRole.roleName + " Successfully";
                 }
                 return "Something went wrong";
             }
             return "Invalid user or Role";
+        }
+        public async Task<bool> CreateUserRole(ApplicationUser user, string role)
+        {
+            if(role?.ToLower() == "employee")
+            {
+                EmployeeRepository.AddAsync(new Employee
+                {
+                    Id = user.Id,
+                });
+                EmployeeRepository.Save();
+                return true;
+            }
+            else if(role?.ToLower() == "employer")
+            {
+                EmployerRepository.AddAsync(new Employer
+                {
+                    Id = user.Id,
+                });
+                EmployeeRepository.Save();
+
+                return true;
+            }
+            else if (role?.ToLower() == "admin")
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

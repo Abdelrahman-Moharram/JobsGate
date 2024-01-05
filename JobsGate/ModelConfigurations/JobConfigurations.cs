@@ -13,6 +13,7 @@ namespace JobsGate.ModelConfigurations
 
             builder
                 .Property(i => i.Salary)
+                .HasDefaultValue(0m)
                 .HasColumnType("Money");
 
             builder
@@ -33,14 +34,14 @@ namespace JobsGate.ModelConfigurations
                 .HasForeignKey(i=>i.CategoryId);
 
             builder
-                .HasOne(i => i.Employeer)
+                .HasOne(i => i.Employer)
                 .WithMany(i => i.Jobs)
-                .HasForeignKey(i => i.EmployeerId);
-
+                .HasForeignKey(i => i.EmployerId);
             builder
                 .HasOne(i => i.Industry)
                 .WithMany(i => i.Jobs)
-                .HasForeignKey(i => i.IndustryId);
+                .HasForeignKey(i => i.IndustryId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder
                .HasOne(i => i.JobType)

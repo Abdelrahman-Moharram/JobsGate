@@ -1,6 +1,6 @@
 ﻿namespace JobsGate.Models
 {
-    public class Employeer : ApplicationUser
+    public class Employer : ApplicationUser
     {
         public string Id {  get; set; } = Guid.NewGuid().ToString();
         public string? JobTitle {  get; set; }

@@ -17,29 +17,32 @@ namespace JobsGate.Controllers
             JobRepository = _JobRepository;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Jobs(int start=0, int end=20)
+        [HttpGet("jobs")]
+        public async Task<IActionResult> Jobs(int start = 0, int end = 20)
         {
             var jobs = await JobRepository.PaginateAsync(start, end);
-            List <JobsListDTO> jobsListDTOs = new List<JobsListDTO>();
+            List<JobsDTO> jobsListDTOs = new List<JobsDTO>();
             foreach (var job in jobs)
             {
-                jobsListDTOs.Add(new JobsListDTO 
+                jobsListDTOs.Add(new JobsDTO
                 {
                     Id = job.Id,
                     Title = job.Title,
                     Category = job.Category?.Title,
                     Description = job.Description,
-                    Employeer = job.Employeer?.UserName,
-                    Experience = job.Experience,    
+                    Employer = job.Employer?.UserName,
+                    Experience = job.Experience,
                     PostedAt = job.PostedAt,
-                    Salary = job.Salary,    
+                    Salary = job.Salary,
                     Industry = job.Industry?.Title,
                     vacancies = job.Vacancies,
                 });
             }
-            return  Ok(jobsListDTOs);
+            return Ok(jobsListDTOs);
         }
+        
+
+        
 
     }
 }
