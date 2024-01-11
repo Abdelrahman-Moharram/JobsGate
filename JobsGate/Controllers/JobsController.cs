@@ -6,6 +6,7 @@ using JobsGate.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
 namespace JobsGate.Controllers
@@ -16,15 +17,18 @@ namespace JobsGate.Controllers
     {
         private readonly IBaseRepository<Job> JobRepository;
         private readonly IBaseRepository<Employer> EmployerRepository;
+        private readonly IBaseRepository<Employee> EmployeeRepository;
         private readonly IBaseRepository<JobApplication> JobApplicationRepository;
         public JobsController(
             IBaseRepository<Job> _JobRepository, 
             IBaseRepository<Employer> _EmployerRepository,
+            IBaseRepository<Employee> _EmployeeRepository,
             IBaseRepository<JobApplication> _JobApplicationRepository
             )
         {
             JobRepository = _JobRepository;
             EmployerRepository = _EmployerRepository;  
+            EmployeeRepository = _EmployeeRepository;
             JobApplicationRepository = _JobApplicationRepository;
 
         }
@@ -60,6 +64,14 @@ namespace JobsGate.Controllers
             var roles = claims.FirstOrDefault(i => i.Type == ClaimTypes.Role)?.Value;
 
             if (Employer?.Id == EmployerId || roles.ToLower().Contains("admin"))
+                return true;
+
+            return false;
+        }
+        private async Task<bool> IsAlreadyApplied(string EmployeeId, string JobId)
+        {
+
+            if (await JobApplicationRepository.FindAsync(i=>i.EmployeeId == EmployeeId && i.JobId == JobId) != null)
                 return true;
 
             return false;
@@ -181,12 +193,20 @@ namespace JobsGate.Controllers
 
 
         [HttpPost("{id}/apply")]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> ApplyJob(string id,[FromForm] JobApplicationDTO applicationDTO, IFormFile CV)
         {
+            
             ModelState.Remove("CV");
             FileUpload fileUpload = new FileUpload();
-            if (id == applicationDTO.JobId && ModelState.IsValid)
+            var userId = User.Claims.FirstOrDefault(i => i.Type == "userId")?.Value;
+            var Employee = await EmployeeRepository.FindAsync(i => i.UserId == userId);
+            if (id == applicationDTO.JobId && Employee.Id == applicationDTO.EmployeeId && ModelState.IsValid)
             {
+                if (await IsAlreadyApplied(applicationDTO.EmployeeId, applicationDTO.JobId))
+                    return BadRequest("This Employee Already Applied !");
+
+
                 JobApplicationRepository.AddAsync(new JobApplication
                 {
                     CV = fileUpload.UploadCV(CV),
