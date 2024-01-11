@@ -18,6 +18,7 @@ namespace JobsGate
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -69,6 +70,24 @@ namespace JobsGate
                 };
 
             });
+
+            builder.Services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true; // Enable synchronous I/O for file upload
+            });
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin();
+                                      policy.AllowAnyMethod();
+                                      policy.AllowAnyHeader();
+                                      policy.AllowAnyOrigin();
+                                  });
+            });
+
             //----------------------------------------------------------------------------------//
 
             var app = builder.Build();
@@ -79,8 +98,9 @@ namespace JobsGate
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseAuthorization();
 

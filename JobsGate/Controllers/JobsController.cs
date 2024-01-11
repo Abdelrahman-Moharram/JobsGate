@@ -1,5 +1,6 @@
 ﻿using JobsGate.DTO;
 using JobsGate.DTO.Jobs;
+using JobsGate.Helpers;
 using JobsGate.Models;
 using JobsGate.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -15,10 +16,16 @@ namespace JobsGate.Controllers
     {
         private readonly IBaseRepository<Job> JobRepository;
         private readonly IBaseRepository<Employer> EmployerRepository;
-        public JobsController(IBaseRepository<Job> _JobRepository, IBaseRepository<Employer> _EmployerRepository)
+        private readonly IBaseRepository<JobApplication> JobApplicationRepository;
+        public JobsController(
+            IBaseRepository<Job> _JobRepository, 
+            IBaseRepository<Employer> _EmployerRepository,
+            IBaseRepository<JobApplication> _JobApplicationRepository
+            )
         {
             JobRepository = _JobRepository;
-            EmployerRepository = _EmployerRepository;   
+            EmployerRepository = _EmployerRepository;  
+            JobApplicationRepository = _JobApplicationRepository;
 
         }
 
@@ -29,14 +36,21 @@ namespace JobsGate.Controllers
             {
                 Id = job.Id,
                 Title = job.Title,
-                Category = job.Category?.Title,
-                Description = job.Description,
-                Employer = job.Employer?.User?.UserName,
+                CategoryTitle = job?.Category?.Title,
+                CategoryId = job?.Category?.Id,
+                Description = job?.Description,
+                EmployerName = job?.Employer?.User.UserName,
+                EmployerId = job?.Employer?.Id,
+                EmployerJobTitle = job?.Employer?.JobTitle,
                 Experience = job.Experience,
                 PostedAt = job.PostedAt,
                 Salary = job.Salary,
-                Industry = job.Industry?.Title,
+                IndustryId = job.Industry?.Id,
+                IndustryTitle = job.Industry?.Title,
                 vacancies = job.Vacancies,
+                JobTypeId = job.JobType?.Id,
+                JobTypeName = job.JobType?.Name
+
             };
         }
         private async Task<bool> IsJobPublisherOrAdmin(IEnumerable<Claim> claims, string EmployerId)
@@ -116,6 +130,7 @@ namespace JobsGate.Controllers
             });
         }
 
+
         [HttpDelete("{id}/Delete")]
         [Authorize(Roles = "Employer, Admin")]
         public async Task<IActionResult> DeleteJob([FromRoute] string id)
@@ -132,6 +147,63 @@ namespace JobsGate.Controllers
             }
 
             return BadRequest("Invalid user credintials or job not found");
+        }
+
+
+
+
+        [HttpGet("{id}/Applications")]
+        [Authorize(Roles = "Employer, Admin")]
+        public async Task<IActionResult> JobApplications(string id)
+        {
+            var job = await JobRepository.GetByIdAsync(id);
+            if (job == null)
+                return NotFound();
+            var result = await IsJobPublisherOrAdmin(User.Claims, job.EmployerId);
+            if (result)
+            {
+                var applications = new  List<JobApplicationDTO>() ;
+                foreach (var application in await JobApplicationRepository.GetAllAsync())
+                {
+                    applications.Add(new JobApplicationDTO
+                    {
+                        EmployeeName = application?.Employee?.User.UserName,
+                        CoverLetter = application?.CoverLetter,
+                        JobName = application?.Job?.Title,
+                        JobId = application?.JobId,
+                        EmployeeId = application?.EmployeeId,
+                    }); 
+                }
+                return Ok(applications);
+            }
+            return BadRequest("Invalid user credintials or job not found");
+        }
+
+
+        [HttpPost("{id}/apply")]
+        public async Task<IActionResult> ApplyJob(string id,[FromForm] JobApplicationDTO applicationDTO, IFormFile CV)
+        {
+            ModelState.Remove("CV");
+            FileUpload fileUpload = new FileUpload();
+            if (id == applicationDTO.JobId && ModelState.IsValid)
+            {
+                JobApplicationRepository.AddAsync(new JobApplication
+                {
+                    CV = fileUpload.UploadCV(CV),
+                    CoverLetter = applicationDTO.CoverLetter,
+                    EmployeeId = applicationDTO.EmployeeId,
+                    JobId = applicationDTO.JobId,
+                });
+                JobRepository.Save();
+                return Ok(new ResponseDTO
+                {
+                    Message="Data Saved Successfully"
+                });
+            }
+            return BadRequest(new ResponseDTO
+            {
+                Message = "Received Data is Invalid"
+            });
         }
     }
 }
